@@ -1,0 +1,34 @@
+jobs:
+  build:
+    docker:
+      - image: cimg/python:3.10.1
+    resource_class: small
+    steps:
+      - checkout
+      - run: 
+          name: Insall FFmpeg
+          command: sudo apt update && sudo apt install ffmpeg -y  
+      - run: 
+          name: Upgrade pip
+          command: /home/circleci/.pyenv/versions/3.10.1/bin/python3.10 -m pip install --upgrade pip
+      - run: 
+          name: Insall Python Modules
+          command: pip3 install beautifulsoup4 Pillow ffmpy feedparser Mastodon.py filetype       
+      - run: 
+          name: Begin
+          command: python3 run.py
+workflows:
+  version: 2
+  commit:
+    jobs:
+      - build
+  nightly:
+    triggers:
+      - schedule:
+          cron: "32 17 * * *"
+          filters:
+            branches:
+              only: 
+                - master
+    jobs:
+      - build
